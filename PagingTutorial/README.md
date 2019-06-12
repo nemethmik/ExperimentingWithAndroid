@@ -13,4 +13,9 @@ which wrote "You should make sure all these are committed to version
 control. They are all small, system-independent, and critical to using
 the Gradle Wrapper."
 
+## Dependencies
+[Retrofit](https://square.github.io/retrofit/) v 2.6.0 
+[Glide](https://github.com/bumptech/glide) 4.9.0
+ 
+
   
