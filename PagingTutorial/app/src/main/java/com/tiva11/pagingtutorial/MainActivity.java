@@ -1,13 +1,20 @@
 package com.tiva11.pagingtutorial;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+        callStackExchange();
     }
 
     @Override
@@ -48,5 +56,26 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+    private void callStackExchange() {
+        Log.d("MIKI","Calling Stack Exchange API via Retrofit ...");
+        Call<StackExchangeAnswers> call = StackExchangeCient.getStackExchangeAPI().getAnswers(1,5,StackExchangeCient.STACKOVERFLOW);
+        call.enqueue(new Callback<StackExchangeAnswers>() {
+            @Override
+            public void onResponse(@NonNull Call<StackExchangeAnswers> call, @NonNull Response<StackExchangeAnswers> response) {
+                StackExchangeAnswers answers = response.body();
+                Snackbar.make(findViewById(R.id.fab),"Number of responses is " +
+                        (answers != null ? answers.items.size() : -1), Snackbar.LENGTH_LONG)
+                        .setAction("OK", null).show();
+                Log.d("MIKI","Stack Exchange replied OK");
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<StackExchangeAnswers> call, @NonNull Throwable t) {
+                Toast.makeText(MainActivity.this, "Error:"+ t.getMessage(),Toast.LENGTH_LONG).show();
+                Log.e("MIKI","Oops. Stack Exchange error: " + t.getMessage());
+                t.printStackTrace();
+            }
+        });
     }
 }
