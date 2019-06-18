@@ -23,12 +23,19 @@ the Gradle Wrapper."
 # StackExchange API
 [Answers API Documentation](http://api.stackexchange.com/docs/answers) has a Try It section which gives complete documentation on using the API and the response.
 
-IStackExchangeAPI, StackExchangeAnswers and StackExchangeClient (using REtrofit) were added.
-Internet permission added to AndroidManifest.xml
-callStackExchange added to MainActivity
-Remember to restart emulater when you have no internet error on the virtual device.
-More or less I followed the instruction from video [#2 Android Paging Library Tutorial - Backend API](https://www.youtube.com/watch?v=sCfq8yAd_CA&list=PLk7v1Z2rk4hjCQw1RVoYPRdeIzwdz5_Fi&index=2) 
-and I tested the application both in emulator and on my Note 8.
-This Retrofit is really greate and easy to use.
+IStackExchangeAPI, StackExchangeAnswers and StackExchangeClient (using
+REtrofit) were added. Internet permission added to AndroidManifest.xml
+callStackExchange added to MainActivity Remember to restart emulater
+when you have no internet error on the virtual device. More or less I
+followed the instruction from video
+[#2 Android Paging Library Tutorial - Backend API](https://www.youtube.com/watch?v=sCfq8yAd_CA&list=PLk7v1Z2rk4hjCQw1RVoYPRdeIzwdz5_Fi&index=2)
+and I tested the application both in emulator and on my Note 8. This
+Retrofit is really greate and easy to use. 
 
-  
+There is an accompanying video [Java Programming with Android Studio 3.4 - Retrofit HTTP Stack Exchange](https://www.youtube.com/watch?v=PdfwtJOOuFw&list=PLeLsYxj1gjvHV_WpEFbmYhEfJY3sBYa0X&index=1)
+
+# Paging Recycler View Handling Added
+There is an accompanying video
+[Java Programming with Android Studio 3.4 - Paged List Adapter Example](https://www.youtube.com/watch?v=33lRvzgmzDs&list=PLeLsYxj1gjvHV_WpEFbmYhEfJY3sBYa0X&index=2)
+This sample from Belal eventually is really pathetic, I unsubscribed
+right away from his Youtube channel.
