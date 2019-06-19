@@ -1,5 +1,6 @@
 package com.tiva11.as34essentials32viewmodeldemo.ui.main;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -40,13 +41,19 @@ public class MainFragment extends Fragment {
         dollarText = getView().findViewById(R.id.dollarText);
         resultText = getView().findViewById(R.id.resultText);
         convertButton = getView().findViewById(R.id.convertButton);
-        resultText.setText(mViewModel.getResult().toString());
+//        resultText.setText(mViewModel.getResult().toString());
+        mViewModel.getResult().observe(this, new Observer<Float>() {
+            @Override
+            public void onChanged(@Nullable Float aFloat) {
+                resultText.setText(aFloat.toString());
+            }
+        });
         convertButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!dollarText.getText().toString().equals("")) {
                     mViewModel.setAmount(dollarText.getText().toString());
-                    resultText.setText(mViewModel.getResult().toString());
+//                    resultText.setText(mViewModel.getResult().toString());
                 } else {
                     resultText.setText("No Value");
                 }

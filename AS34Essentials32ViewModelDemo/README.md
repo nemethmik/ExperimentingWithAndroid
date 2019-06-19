@@ -13,3 +13,7 @@ plain `new` operator, the result text is not preserved upon rotating the
 phone. It was interesting to see that a ViewModel object can be
 instantiated with the new operator.
 
+# Using Live Data
+The next version was based on chapter 33.
+
+
