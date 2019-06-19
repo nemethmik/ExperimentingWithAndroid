@@ -4,8 +4,8 @@ Essentials/Java. Here the event handler of the button click is an
 anonymous object. The application/controller logic is not separated from
 the UI intricacies. View Model is fine for business logic, nevertheless.
 
-` mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);  
-mViewModel = new MainViewModel()`; 
+    mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);  
+    mViewModel = new MainViewModel(); 
 
 When the ViewModel object is created with the normal way, rotating the
 phone preserves the result text on the screen. When created with the
