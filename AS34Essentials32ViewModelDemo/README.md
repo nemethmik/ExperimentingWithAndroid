@@ -76,14 +76,19 @@ separate puml files and not embedded in md documents.
 
 ![Arcchitecture Diagram](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.github.com/nemethmik/ExperimentingWithAndroid/master/AS34Essentials32ViewModelDemo/arch10.puml)
 
+It was very important to add `cache=no` to the link. And the brilliant
+with this solution, thanks to anoff, that it works right away with
+Markdown Navigator, too, in AS.
 
 # Data Binding Might Still Be Interesting
 After I learned the first article
 [No More findViewById](https://medium.com/androiddevelopers/no-more-findviewbyid-457457644885)
-from [George Mount's series about data binding](https://medium.com/@georgemount007) , I changed my mind, and I
-am open to learn more about data binding, and I'll decide later.
-
-
-
-
+from
+[George Mount's 2016-17 series about data binding](https://medium.com/@georgemount007)
+, I changed my mind, and I am open to learn more about data binding, and
+I'll decide later. So, I have implemented the first step, I enabled data
+binding and eliminated all findViewById calls and variables. Instead, I
+used the generated fragment binding class to access the fields. The nice
+thing with the generated class is that it is typed, no need for tzpe
+casting findViewById any more.
 
