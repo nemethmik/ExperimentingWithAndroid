@@ -74,7 +74,8 @@ so I could make puml or plantuml files and visualize them within AS.
 In order to get rendered images on GitHub, diagrams are to be written in
 separate puml files and not embedded in md documents. 
 
-![Arcchitecture Diagram](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/nemethmik/ExperimentingWithAndroid/master/AS34Essentials32ViewModelDemo/arch10.puml)
+![Arcchitecture Diagram](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.github.com/nemethmik/ExperimentingWithAndroid/master/AS34Essentials32ViewModelDemo/arch10.puml)
+
 
 # Data Binding Might Still Be Interesting
 After I learned the first article
