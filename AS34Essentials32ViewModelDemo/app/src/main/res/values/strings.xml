@@ -2,4 +2,5 @@
     <string name="app_name">AS34Essentials32ViewModelDemo</string>
     <string name="convert">Convert</string>
     <string name="dollars">Dollars</string>
+    <string name="euros">Euros</string>
 </resources>

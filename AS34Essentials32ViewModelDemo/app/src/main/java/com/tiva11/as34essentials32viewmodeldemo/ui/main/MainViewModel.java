@@ -5,16 +5,17 @@ import android.arch.lifecycle.ViewModel;
 
 public class MainViewModel extends ViewModel {
     private static final Float usd_to_eu_rate = 0.74F;
-    private String dollarText = "";
-//    private Float result = 0F;
-    private MutableLiveData<Float> result = new MutableLiveData<>();
-    public void setAmount(String value) {
-        this.dollarText = value;
-//        result = Float.valueOf(dollarText) * usd_to_eu_rate;
-        result.setValue(Float.valueOf(dollarText) * usd_to_eu_rate);
+    public MutableLiveData<String> dollarText = new MutableLiveData<>();
+    public MutableLiveData<Float> euroFloatValue = new MutableLiveData<>();
+    public MainViewModel() {
+        dollarText.setValue("");
+        convertValue();
     }
-//    public Float getResult() {
-    public MutableLiveData<Float> getResult() {
-        return result;
+    public void convertValue() {
+        try {
+            euroFloatValue.setValue(Float.valueOf(dollarText.getValue()) * usd_to_eu_rate);
+        } catch(Exception e) {
+            euroFloatValue.setValue(0F);
+        }
     }
 }

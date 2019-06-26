@@ -2,6 +2,14 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="mainFragmentViewModel"
+            type="com.tiva11.as34essentials32viewmodeldemo.ui.main.MainViewModel" />
+        <variable
+            name="mainFragment"
+            type="com.tiva11.as34essentials32viewmodeldemo.ui.main.MainFragment" />
+    </data>
 <android.support.constraint.ConstraintLayout
     android:id="@+id/main"
     android:layout_width="match_parent"
@@ -17,7 +25,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/convertButton"
-        tools:text="MainFragment" />
+        android:text='@{@string/euros + ":" + mainFragmentViewModel.euroFloatValue}' />
 
     <EditText
         android:id="@+id/dollarText"
@@ -29,6 +37,7 @@
         android:ems="10"
         android:importantForAutofill="no"
         android:inputType="numberDecimal"
+        android:text="@={mainFragmentViewModel.dollarText}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -39,6 +48,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:onClick="@{()->mainFragmentViewModel.convertValue()}"
         android:text="@string/convert"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
