@@ -4,5 +4,9 @@ On Mac the default text editor for MD files is Xcode, so I used Xcode to edit th
 I have downloaded GitHub Desktop, either, to get more precise version control of the projects within this repository.
 Instead of GitHub to monitor what AS version control does, Visual Studio Code is far better. VSC in general is far better than anything else including AS. So, I am going to use VSC along with AS to do tasks where VSC is a lot better. VSC, for example, automatically marks in the editor when you are changing source files, which sections are new, which have been modified, simply brilliant; AS looks really a stone age dead slow tool vs VSC. VSC is brilliant with Flutter. The major problem with Flutter is that it doesn't support WearOS, today. I am just working on learning the new  Paging Library from Android Architecture, and it really looks terrbly overcomplicated, totally unintuitive vs Flutter's clean architecture, honestly. Google is promoting Kotlin vs Java for native Android programming, but honestly Java is a lot cleaner language, but Google has only exemples recently for Kotlin. Flutter/Dart is a clean language, too, just like Java.
 Flutter/VSC is so much more efficient than Android Studio/Java.
+
 ## Paging Tutorial
 [Paging Tutorial](https://github.com/nemethmik/ExperimentingWithAndroid/tree/master/PagingTutorial) is an AS/Java project experimenting with the new Paging Library from Android Architecture.
+
+## Android Studio 3.4 Essentials View Model Demo (32 - 35)
+This example is basically from the book Android Studio 3.4 Essentials chapters 32 - 35: [Android Jetpack ViewModel, LiveData, Data Binding, Binding Expressions in Layout XML Tutorials](https://github.com/nemethmik/ExperimentingWithAndroid/tree/master/AS34Essentials32ViewModelDemo) 
