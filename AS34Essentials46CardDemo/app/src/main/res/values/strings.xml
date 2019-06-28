@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">AS34Essentials46CardDemo</string>
+    <string name="action_settings">Settings</string>
+    <string name="item_image">Item image</string>
+    <string name="item_title">Item Title</string>
+    <string name="item_description">Item Description</string>
+</resources>
