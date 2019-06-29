@@ -1,0 +1,4 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.tiva11.food2fork" >
+    <uses-permission android:name="android.permission.INTERNET"/>
+</manifest>
