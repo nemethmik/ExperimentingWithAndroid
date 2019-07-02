@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
+@Deprecated
 public abstract class BaseActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     @Override

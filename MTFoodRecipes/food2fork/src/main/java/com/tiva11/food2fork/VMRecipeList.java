@@ -7,12 +7,11 @@ import android.arch.lifecycle.ViewModel;
 import java.util.List;
 
 public class VMRecipeList extends ViewModel {
-    private MutableLiveData<List<Recipe>> recipeList = new MutableLiveData<>();
+    private final MutableLiveData<List<Recipe>> recipeList = new MutableLiveData<>();
     public LiveData<List<Recipe>> getRecipes() {return recipeList;} //Read-only for UI
-    public MutableLiveData<String> queryString = new MutableLiveData<>();//editText @={vm.queryString}
+    public final MutableLiveData<String> queryString = new MutableLiveData<>();//editText @={vm.queryString}
     final public MutableLiveData<Integer> page = new MutableLiveData<>();
-    private MutableLiveData<Throwable> error = new MutableLiveData<>();
-    public LiveData<Throwable> getError() {return error;}
+    public final MutableLiveData<Throwable> error = new MutableLiveData<>();
     //queryString and page should be set before calling/triggering this event/function
     public void onSearchRecipesRequest() {
         //The parameters are already expected in the queryString and page MLDs

@@ -4,11 +4,17 @@ import android.Manifest;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.pm.PackageManager;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.tiva11.food2fork.Food2Fork;
@@ -16,71 +22,32 @@ import com.tiva11.food2fork.GetRecipeResponse;
 import com.tiva11.food2fork.Recipe;
 import com.tiva11.food2fork.SearchRecipesResponse;
 import com.tiva11.food2fork.VMRecipeList;
+import com.tiva11.mtfoodrecipes.databinding.ActivityRecipeListBinding;
 
 import java.util.List;
 
-public class RecipeListActivity extends BaseActivity implements Food2Fork.IGetRecipeResponse {
+public class RecipeListActivity extends AppCompatActivity {
     private static final String TAG = "RecipeListActivity";
     private VMRecipeList vmRecipeList;
+    private ActivityRecipeListBinding binding;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recipe_list);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_recipe_list);
+        binding.setUIController(this);
+        //This would be an alternative content view initialization, which might work with the
+        //BaseActivity concept. But the Base Activity idea is quite meaningless.
+        //XML inclusion and other more flexible techniques would be available for modular
+        //application structuring
+//        binding = ActivityRecipeListBinding.inflate(getLayoutInflater());
+//        setContentView(binding.getRoot());
+        //setContentView(R.layout.activity_recipe_list); //This is the old style, no data binding
         vmRecipeList = ViewModelProviders.of(this).get(VMRecipeList.class);
         subscribeVMObservers();
-//        askInternetPermission();
-        findViewById(R.id.buttonShowProgressBar).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                testSearchRecipesAsync();
-//                testQueryRecipesAsync(); //The progressBar is not shown with this call, so just use the search.
-            load1stPageViaTheVM();
-            }
-        });
-        findViewById(R.id.buttonHideProgressBar).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showProgressBar(false);
-            }
-        });
+        initRV();
     }
-    // Make sure to check internet permission, otherwise Retrofit async calls crashes the application
-    @Deprecated
-    void testSearchRecipesAsync(){
-        if(isInternetPermissionGranted(true)) {
-            Food2Fork.searchRecipesAsync("Chicken breast", 1, new Food2Fork.ISearchRecipesResponse() {
-                @Override
-                public void onResponseSearchRecipes(SearchRecipesResponse response, String queryString, int page) {
-                    showProgressBar(false);
-                    Toast.makeText(RecipeListActivity.this, "Number of recipes on page 1 is " + response.count, Toast.LENGTH_LONG).show();
-                    showProgressBar(true);
-                    Food2Fork.getRecipeAsync(response.recipes.get(0).recipeId,RecipeListActivity.this);
-                    //async await is badly missing in Java, this is the only reason to pick Kotlin, it has async await
-                }
-                @Override
-                public void onFailureSearchRecipes(Throwable t, String queryString, int page) {
-                    showErrorMessage(t);
-                }
-            });
-        }
-    }
-    // Food2Fork.queryRecipesAsync is implemented in a way that catches missing internet permission
-    // It's better to use the search function
-    @Deprecated
-    void testQueryRecipesAsync() {
-        Food2Fork.queryRecipesAsync("Chicken breast", 1, new Food2Fork.ISearchRecipesResponse() {
-            @Override
-            public void onResponseSearchRecipes(SearchRecipesResponse response, String queryString, int page) {
-                showProgressBar(false);
-                Toast.makeText(RecipeListActivity.this, "Number of recipes on page 1 is " + response.count, Toast.LENGTH_LONG).show();
-                Food2Fork.getRecipeAsync(response.recipes.get(0).recipeId,RecipeListActivity.this);
-            }
-            @Override
-            public void onFailureSearchRecipes(Throwable t, String queryString, int page) {
-                showErrorMessage(t);
-            }
-        });
-        showProgressBar(false);
+    public void showProgressBar(boolean show) {
+        binding.progressBar.setVisibility(show ? ProgressBar.VISIBLE : ProgressBar.INVISIBLE);
     }
     boolean isInternetPermissionGranted(boolean showToastMessage) {
         if(ContextCompat.checkSelfPermission(RecipeListActivity.this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
@@ -90,17 +57,6 @@ public class RecipeListActivity extends BaseActivity implements Food2Fork.IGetRe
             }
             return false;
         } else return true;
-    }
-
-    @Override @Deprecated
-    public void onResponseGetRecipe(GetRecipeResponse response, String recipeId) {
-        showProgressBar(false);
-        Toast.makeText(RecipeListActivity.this, "Recipe is " + response.recipe.title, Toast.LENGTH_LONG).show();
-    }
-
-    @Override @Deprecated
-    public void onFailureGetRecipe(Throwable t, String recipeId) {
-        showErrorMessage(t);
     }
     void showErrorMessage(Throwable t) {
         showProgressBar(false);
@@ -118,18 +74,48 @@ public class RecipeListActivity extends BaseActivity implements Food2Fork.IGetRe
                     Log.d(TAG, "onChanged: no recipes");
                     Toast.makeText(RecipeListActivity.this, "No recipes", Toast.LENGTH_SHORT).show();
                 }
+                if(binding.recipeListRV.getAdapter() instanceof RecipeListRVAdapter){
+                    RecipeListRVAdapter adapter = (RecipeListRVAdapter)binding.recipeListRV.getAdapter();
+                    adapter.setRecipeList(recipes);
+                }
             }
         });
-        vmRecipeList.getError().observe(this, new Observer<Throwable>() {
+        vmRecipeList.error.observe(this, new Observer<Throwable>() {
             @Override public void onChanged(@Nullable Throwable t) { showErrorMessage(t); }
         });
     }
-    void load1stPageViaTheVM() {
+    public void load1stPageViaTheVM() {
         if(isInternetPermissionGranted(true)) {
             showProgressBar(true);
             vmRecipeList.queryString.setValue("Chicken breast");
             vmRecipeList.page.setValue(1);
             vmRecipeList.onSearchRecipesRequest(); //The recipes are pumped into a LD of the VM, which is observed by this activity
         }
+    }
+    void initRV() {
+        binding.recipeListRV.setLayoutManager(new LinearLayoutManager(this));
+        binding.recipeListRV.setHasFixedSize(true);
+        /*
+        final RecipeListRVAdapter adapter = new RecipeListRVAdapter(vmRecipeList.error, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(v.getTag() instanceof RecipeListRVAdapter.RecipeListVH) {
+                    RecipeListRVAdapter.RecipeListVH vh = (RecipeListRVAdapter.RecipeListVH)v.getTag();
+                    if(vh.recipe != null) {
+                        Toast.makeText(RecipeListActivity.this, "Recipe " + vh.recipe.title, Toast.LENGTH_SHORT).show();
+                    } else vmRecipeList.error.setValue(new Exception("Recipe is null in the view holder"));
+                }
+            }
+        });
+        */
+        final RecipeListRVAdapter adapter = new RecipeListRVAdapter(vmRecipeList.error, new RecipeListRVAdapter.IOnClickListener() {
+            @Override
+            public void onClick(@NonNull View v,@NonNull Recipe recipe) {
+                //This way we wouldn't need this setTag/getTag smart solution
+                //This is possible only with data binding.
+                Toast.makeText(RecipeListActivity.this, "Recipe " + recipe.title, Toast.LENGTH_SHORT).show();
+            }
+        });
+        binding.recipeListRV.setAdapter(adapter);
     }
 }

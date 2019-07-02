@@ -46,16 +46,6 @@ public abstract class Food2Fork {
                 @Query("rId") String recipeId
         );
     }
-    @Deprecated
-    public interface ISearchRecipesResponse {
-        void onResponseSearchRecipes(SearchRecipesResponse response,String queryString,int page);
-        void onFailureSearchRecipes(Throwable t,String queryString,int page);
-    }
-    @Deprecated
-    public interface IGetRecipeResponse {
-        void onResponseGetRecipe(GetRecipeResponse response,String recipeId);
-        void onFailureGetRecipe(Throwable t,String recipeId);
-    }
     private final static String BASE_URL = "https://www.food2fork.com/api/";
     private final static String API_KEY = "ab2a9a71b650f8081ed259c7c2a4e13c";
     private static Retrofit httpClient = new Retrofit.Builder().baseUrl(BASE_URL)
@@ -64,24 +54,6 @@ public abstract class Food2Fork {
     /*
     Warning! Make sure to add INTERNET permission, otherwise this call crashes the addon without any message.
      */
-    @Deprecated
-    public static void searchRecipesAsync(final String queryString, final int page, @NonNull final ISearchRecipesResponse onResponse) {
-        try {
-            Call<SearchRecipesResponse> call = api.searchRecipes(API_KEY, queryString, page);
-            call.enqueue(new Callback<SearchRecipesResponse>() {
-                @Override
-                public void onResponse(Call<SearchRecipesResponse> call, Response<SearchRecipesResponse> response) {
-                    onResponse.onResponseSearchRecipes(response.body(), queryString, page);
-                }
-                @Override
-                public void onFailure(Call<SearchRecipesResponse> call, Throwable t) {
-                    onResponse.onFailureSearchRecipes(t, queryString, page);
-                }
-            });
-        } catch(Throwable t) {
-          onResponse.onFailureSearchRecipes(t,queryString,page);
-        }
-    }
     public static void searchRecipesAsync(final String queryString, final int page,
                                           @NonNull final MutableLiveData<List<Recipe>> mldRecipeList,
                                           @NonNull final MutableLiveData<Throwable> mldError) {
@@ -90,7 +62,7 @@ public abstract class Food2Fork {
             call.enqueue(new Callback<SearchRecipesResponse>() {
                 @Override
                 public void onResponse(Call<SearchRecipesResponse> call, Response<SearchRecipesResponse> response) {
-                    if(response.isSuccessful() && response.body() != null) {
+                    if(ok(response,mldError)) {
                         if(page > 1) {
                             //This just adds more and more data to the list, it'' the job of the VM to clear the
                             //list when not needed.
@@ -101,13 +73,6 @@ public abstract class Food2Fork {
                         } else {
                             mldRecipeList.postValue(response.body().recipes);
                         }
-                    } else {
-                        try {
-                            if(response.errorBody() != null) mldError.postValue(new Exception(response.errorBody().string()));
-                            else mldError.postValue(new Exception("null errorBody in response"));
-                        } catch(Exception e) {
-                            mldError.postValue(e);
-                        }
                     }
                 }
                 @Override
@@ -117,49 +82,6 @@ public abstract class Food2Fork {
             });
         } catch(Throwable t) {
             mldError.postValue(t);
-        }
-    }
-    /*
-    * This version uses Retrofit's synchronous call within AsyncTask.
-    * The parametrization of AsyncTask is really cumbersome
-    * which cannot be a generic since then the Java compiler would complain about using a generic type in vararg.
-    * The only benefit this would provide, that it doesn't crash on No internet permission error
-    */
-    @Deprecated
-    public static void queryRecipesAsync(final String queryString, final int page, @NonNull final ISearchRecipesResponse onResponse){
-        try {
-            (new AsyncTask<Void,Void,SearchRecipesResponse>() {
-                @Override
-                protected SearchRecipesResponse doInBackground(Void... voids) {
-                    try {
-                        Call<SearchRecipesResponse> call = api.searchRecipes(API_KEY, queryString, page);
-                        Response<SearchRecipesResponse> response = call.execute();
-                        if(response.errorBody() != null) {
-                            try {
-                                return SearchRecipesResponse.createError(response.errorBody().string());
-                            } catch (IOException ioExcaption) {
-                                return SearchRecipesResponse.createError("errorBody.string IOException");
-                            }
-                        } else return response.body();
-                    } catch (Throwable e) {
-                        return SearchRecipesResponse.createError(e.toString());
-                    }
-                }
-                @Override
-                protected void onPostExecute(SearchRecipesResponse response) {
-                    if(response != null) {
-                        if (response.error == null) {
-                            onResponse.onResponseSearchRecipes(response, queryString, page);
-                        } else {
-                            onResponse.onFailureSearchRecipes(new Exception(response.error), queryString, page);
-                        }
-                    } else {
-                        onResponse.onFailureSearchRecipes(new Exception("Null response in onPostExecute"), queryString, page);
-                    }
-                }
-            }).execute((Void)null);
-        } catch (Throwable e) {
-            onResponse.onFailureSearchRecipes(e,queryString,page);
         }
     }
     private static ScheduledExecutorService executorServiceThreadPool = Executors.newScheduledThreadPool(3);
@@ -173,16 +95,7 @@ public abstract class Food2Fork {
                 try {
                     Call<SearchRecipesResponse> call = api.searchRecipes(API_KEY, queryString, page);
                     Response<SearchRecipesResponse> response = call.execute();
-                    if(response.errorBody() != null) {
-                        try {
-                            mldError.postValue(new Exception(response.errorBody().string()));
-                        } catch (IOException ioException) {
-                            mldError.postValue(new Exception("errorBody.string IOException",ioException));
-                        }
-                    } else {
-                        if(response.body() != null) mldRecipeList.postValue(response.body().recipes);
-                        else mldError.postValue(new Exception("Body is null in response"));
-                    }
+                    if(ok(response,mldError)) mldRecipeList.postValue(response.body().recipes);
                 } catch (Throwable e) {
                     mldError.postValue(e);
                 }
@@ -191,28 +104,44 @@ public abstract class Food2Fork {
         final Future scheduledJob = executorServiceThreadPool.schedule(r,0, TimeUnit.SECONDS);
         executorServiceThreadPool.schedule(new Runnable() {
             @Override public void run() { scheduledJob.cancel(true); }
-        },5,TimeUnit.SECONDS); //It tries to kill the worker thread in 5 seconds
+        },55,TimeUnit.SECONDS); //It tries to kill the worker thread in 5 seconds
         //Actually, it really kills the job and an interrupt exception is sent to the error handler via the mldError
     }
     /*
     Warning! Make sure to add INTERNET permission, otherwise this call crashes the addon without any message.
      */
-    public static void getRecipeAsync(final String recipeId, @NonNull final IGetRecipeResponse onResponse) {
+    public static void getRecipeAsync(final String recipeId,
+                                      @NonNull final MutableLiveData<Recipe> mldRecipe,
+                                      @NonNull final MutableLiveData<Throwable> mldError) {
         try {
             Call<GetRecipeResponse> call = api.getRecipe(API_KEY, recipeId);
             call.enqueue(new Callback<GetRecipeResponse>() {
                 @Override
                 public void onResponse(Call<GetRecipeResponse> call, Response<GetRecipeResponse> response) {
-                    onResponse.onResponseGetRecipe(response.body(), recipeId);
+                    if(ok(response,mldError)) mldRecipe.postValue(response.body().recipe);
                 }
-
                 @Override
                 public void onFailure(Call<GetRecipeResponse> call, Throwable t) {
-                    onResponse.onFailureGetRecipe(t, recipeId);
+                    mldError.postValue(t);
                 }
             });
         } catch(Throwable t) {
-            onResponse.onFailureGetRecipe(t,recipeId);
+            mldError.postValue(t);
+        }
+    }
+    // Returns true when no error was found
+    private static <T> boolean ok(@NonNull Response<T> response,@NonNull final MutableLiveData<Throwable> mldError) {
+        if (response.isSuccessful() && response.body() != null) {
+            return true;
+        } else {
+            if (response.errorBody() != null) {
+                try { //It's interesting that errorBody().string is declared with throws IOException, funny
+                    mldError.postValue(new Exception(response.errorBody().string()));
+                } catch (IOException e) {
+                    mldError.postValue(e);
+                }
+            } else mldError.postValue(new Exception("No error body in failed response"));
+            return false;
         }
     }
 }

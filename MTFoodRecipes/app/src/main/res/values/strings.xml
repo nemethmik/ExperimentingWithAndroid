@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MTFoodRecipes</string>
+    <string name="recipe_image_description">Recipe Image</string>
+    <string name="nameFormat">%2$s, %1$s</string>
 </resources>
