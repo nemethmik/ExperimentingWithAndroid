@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.tiva11.food2fork.Food2Fork;
@@ -45,6 +46,29 @@ public class RecipeListActivity extends AppCompatActivity {
         vmRecipeList = ViewModelProviders.of(this).get(VMRecipeList.class);
         subscribeVMObservers();
         initRV();
+        initSearchView();
+    }
+    void initSearchView(){
+        if(binding.searchView != null) {
+            //There is no way to define binding expression for a search view in the layout XML
+            //The only way is to define a listener here in the UI controller Java class
+            binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                private static final String TAG = "RecipeListActivity";
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+//                Toast.makeText(RecipeListActivity.this, "Query Text:" + query, Toast.LENGTH_SHORT).show();
+                    loadPageOfRecipesViaTheVM(query, 1);
+                    //This is important with false return, the keyboard panel is closed,
+                    //otherwise it is kept open
+                    return false;
+                }
+                @Override
+                public boolean onQueryTextChange(String newText) {
+//                    Log.d(TAG, "onQueryTextChange: " + newText);
+                    return false;
+                }
+            });
+        }
     }
     public void showProgressBar(boolean show) {
         binding.progressBar.setVisibility(show ? ProgressBar.VISIBLE : ProgressBar.INVISIBLE);
@@ -84,11 +108,13 @@ public class RecipeListActivity extends AppCompatActivity {
             @Override public void onChanged(@Nullable Throwable t) { showErrorMessage(t); }
         });
     }
-    public void load1stPageViaTheVM() {
+    //If queryString is null, the previous query, saved in VM, is called
+    //If page is less than 1, the same page is queried again
+    public void loadPageOfRecipesViaTheVM(String queryString, int page) {
         if(isInternetPermissionGranted(true)) {
             showProgressBar(true);
-            vmRecipeList.queryString.setValue("Chicken breast");
-            vmRecipeList.page.setValue(1);
+            if(queryString != null && !queryString.isEmpty()) vmRecipeList.queryString.setValue(queryString);
+            if(page > 0) vmRecipeList.page.setValue(page);
             vmRecipeList.onSearchRecipesRequest(); //The recipes are pumped into a LD of the VM, which is observed by this activity
         }
     }
