@@ -12,6 +12,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
@@ -41,6 +43,7 @@ public class RecipeListActivity extends AppCompatActivity {
 //        setContentView(binding.getRoot());
         //setContentView(R.layout.activity_recipe_list); //This is the old style, no data binding
         vmRecipeList = ViewModelProviders.of(this).get(VMRecipeList.class);
+        setSupportActionBar(binding.toolbar);//This is terribly important for menus
         subscribeVMObservers();
         initSavedQueryRV();
         initSearchViewAndSetListener();
@@ -155,5 +158,30 @@ public class RecipeListActivity extends AppCompatActivity {
             binding.recipeListRV.setAdapter(adapter);
             vmRecipeList.onRetrieveSavedQueriesRequest();
         }
+    }
+    @Override
+    public void onBackPressed() {
+        //When the current page is displaying the recipe list, we should go back to the saved queries list
+        //The user can only quit the application with back buttons only from the saved query list view
+        if(binding.recipeListRV.getAdapter() instanceof RecipeListRVAdapter) {
+            initSavedQueryRV();
+        } else super.onBackPressed();
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.search_menu,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.savedQueriesMenu:
+                initSavedQueryRV();
+                break;
+            case R.id.showFavoritesOnly:
+                //TODO: implement showFavorite Recipes Only
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

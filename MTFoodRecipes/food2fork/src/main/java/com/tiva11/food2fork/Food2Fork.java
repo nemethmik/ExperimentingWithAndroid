@@ -26,6 +26,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 public abstract class Food2Fork {
+    public static final int TIMEOUTINSECONDS = 10;
     static class NotFoundException extends Exception {
         public NotFoundException(String message) {
             super(message);
@@ -108,7 +109,8 @@ public abstract class Food2Fork {
         final Future scheduledJob = executorServiceThreadPool.schedule(r,0, TimeUnit.SECONDS);
         executorServiceThreadPool.schedule(new Runnable() {
             @Override public void run() { scheduledJob.cancel(true); }
-        },55,TimeUnit.SECONDS); //It tries to kill the worker thread in 5 seconds
+        },TIMEOUTINSECONDS,TimeUnit.SECONDS);
+        //It tries to kill the worker thread in a couple of seconds
         //Actually, it really kills the job and an interrupt exception is sent to the error handler via the mldError
     }
     /*
@@ -118,7 +120,7 @@ public abstract class Food2Fork {
                                       @NonNull final MutableLiveData<Recipe> mldRecipe,
                                       @NonNull final MutableLiveData<Throwable> mldError) {
         try {
-            Call<GetRecipeResponse> call = api.getRecipe(API_KEY, recipeId);
+            final Call<GetRecipeResponse> call = api.getRecipe(API_KEY, recipeId);
             call.enqueue(new Callback<GetRecipeResponse>() {
                 @Override
                 public void onResponse(Call<GetRecipeResponse> call, Response<GetRecipeResponse> response) {
@@ -129,6 +131,11 @@ public abstract class Food2Fork {
                     mldError.postValue(t);
                 }
             });
+            executorServiceThreadPool.schedule(new Runnable() {
+                @Override public void run() { call.cancel(); }
+            },TIMEOUTINSECONDS,TimeUnit.SECONDS);
+            //It tries to kill the worker thread in a certain number of seconds
+
         } catch(Throwable t) {
             mldError.postValue(t);
         }
