@@ -1,6 +1,7 @@
 package com.tiva11.mtfoodrecipes;
 
 import android.databinding.BindingAdapter;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -14,7 +15,9 @@ public final class DataBindingAdapters {
     public static void loadImage(ImageView view, String imageUrl) {
 //        Log.d(TAG, "loadImage: " + imageUrl+ " for " + view.toString());
         Glide.with(view.getContext())
-                .load(imageUrl).apply(
+//                .load(Uri.parse(imageUrl))
+                .load(imageUrl)
+                .apply(
                     new RequestOptions().circleCrop().error(R.drawable.ic_launcher_background)
                 )
                 .into(view);

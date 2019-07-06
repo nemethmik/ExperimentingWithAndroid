@@ -4,6 +4,8 @@ import android.arch.lifecycle.MutableLiveData;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
+import com.google.gson.GsonBuilder;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +51,9 @@ public abstract class Food2Fork {
     private final static String BASE_URL = "https://www.food2fork.com/api/";
     private final static String API_KEY = "ab2a9a71b650f8081ed259c7c2a4e13c";
     private static Retrofit httpClient = new Retrofit.Builder().baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create()).build();
+            .addConverterFactory(GsonConverterFactory.create(
+                    new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create()
+            )).build();
     private static IFood2ForkAPI api = httpClient.create(IFood2ForkAPI.class);
     /*
     Warning! Make sure to add INTERNET permission, otherwise this call crashes the addon without any message.

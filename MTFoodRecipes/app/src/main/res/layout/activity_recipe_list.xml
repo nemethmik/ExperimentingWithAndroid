@@ -53,23 +53,10 @@
                 android:id="@+id/recipeListRV"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginBottom="8dp"
-                app:layout_constraintBottom_toTopOf="@+id/load1stPageButton"
                 app:layout_constraintTop_toTopOf="parent">
 
             </android.support.v7.widget.RecyclerView>
 
-            <Button
-                android:id="@+id/load1stPageButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="Load 1st Page"
-                android:onClick='@{()->UIController.loadPageOfRecipesViaTheVM("chicken breast",1)}'
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent" />
         </android.support.constraint.ConstraintLayout>
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"

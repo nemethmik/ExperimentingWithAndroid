@@ -13,15 +13,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.Toast;
 
-import com.tiva11.food2fork.Food2Fork;
-import com.tiva11.food2fork.GetRecipeResponse;
 import com.tiva11.food2fork.Recipe;
-import com.tiva11.food2fork.SearchRecipesResponse;
+import com.tiva11.food2fork.SavedQuery;
 import com.tiva11.food2fork.VMRecipeList;
 import com.tiva11.mtfoodrecipes.databinding.ActivityRecipeListBinding;
 
@@ -45,10 +42,10 @@ public class RecipeListActivity extends AppCompatActivity {
         //setContentView(R.layout.activity_recipe_list); //This is the old style, no data binding
         vmRecipeList = ViewModelProviders.of(this).get(VMRecipeList.class);
         subscribeVMObservers();
-        initRV();
-        initSearchView();
+        initSavedQueryRV();
+        initSearchViewAndSetListener();
     }
-    void initSearchView(){
+    void initSearchViewAndSetListener(){
         if(binding.searchView != null) {
             //There is no way to define binding expression for a search view in the layout XML
             //The only way is to define a listener here in the UI controller Java class
@@ -107,41 +104,56 @@ public class RecipeListActivity extends AppCompatActivity {
         vmRecipeList.error.observe(this, new Observer<Throwable>() {
             @Override public void onChanged(@Nullable Throwable t) { showErrorMessage(t); }
         });
+        vmRecipeList.getSavedQueryList().observe(this, new Observer<List<SavedQuery>>() {
+            @Override
+            public void onChanged(@Nullable List<SavedQuery> savedQueries) {
+                if(binding.recipeListRV.getAdapter() instanceof SavedQueryListRVAdapter) {
+                    ((SavedQueryListRVAdapter)binding.recipeListRV.getAdapter()).submitList(savedQueries);
+                }
+            }
+        });
+        vmRecipeList.selectedSavedQuery.observe(this, new Observer<SavedQuery>() {
+            @Override
+            public void onChanged(@Nullable SavedQuery selectedSavedQuery) {
+                Toast.makeText(RecipeListActivity.this, selectedSavedQuery.queryString + " selected", Toast.LENGTH_SHORT).show();
+                // loadPageOfRecipes function calls initRecipeListRV automatically if the adapter is not for the recipe list
+                loadPageOfRecipesViaTheVM(selectedSavedQuery.queryString,1);
+            }
+        });
     }
     //If queryString is null, the previous query, saved in VM, is called
     //If page is less than 1, the same page is queried again
     public void loadPageOfRecipesViaTheVM(String queryString, int page) {
         if(isInternetPermissionGranted(true)) {
             showProgressBar(true);
+            initRecipeListRV();
             if(queryString != null && !queryString.isEmpty()) vmRecipeList.queryString.setValue(queryString);
             if(page > 0) vmRecipeList.page.setValue(page);
             vmRecipeList.onSearchRecipesRequest(); //The recipes are pumped into a LD of the VM, which is observed by this activity
         }
     }
-    void initRV() {
-        binding.recipeListRV.setLayoutManager(new LinearLayoutManager(this));
-        binding.recipeListRV.setHasFixedSize(true);
-        /*
-        final RecipeListRVAdapter adapter = new RecipeListRVAdapter(vmRecipeList.error, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(v.getTag() instanceof RecipeListRVAdapter.RecipeListVH) {
-                    RecipeListRVAdapter.RecipeListVH vh = (RecipeListRVAdapter.RecipeListVH)v.getTag();
-                    if(vh.recipe != null) {
-                        Toast.makeText(RecipeListActivity.this, "Recipe " + vh.recipe.title, Toast.LENGTH_SHORT).show();
-                    } else vmRecipeList.error.setValue(new Exception("Recipe is null in the view holder"));
+    void initRecipeListRV() {
+        if(!(binding.recipeListRV.getAdapter() instanceof RecipeListRVAdapter)) {
+            binding.recipeListRV.setLayoutManager(new LinearLayoutManager(this));
+            binding.recipeListRV.setHasFixedSize(true);
+            final RecipeListRVAdapter adapter = new RecipeListRVAdapter(vmRecipeList.error, new RecipeListRVAdapter.IOnClickListener() {
+                @Override
+                public void onClick(@NonNull View v, @NonNull Recipe recipe) {
+                    //This way we wouldn't need this setTag/getTag smart solution
+                    //This is possible only with data binding.
+                    Toast.makeText(RecipeListActivity.this, "Recipe " + recipe.title, Toast.LENGTH_SHORT).show();
                 }
-            }
-        });
-        */
-        final RecipeListRVAdapter adapter = new RecipeListRVAdapter(vmRecipeList.error, new RecipeListRVAdapter.IOnClickListener() {
-            @Override
-            public void onClick(@NonNull View v,@NonNull Recipe recipe) {
-                //This way we wouldn't need this setTag/getTag smart solution
-                //This is possible only with data binding.
-                Toast.makeText(RecipeListActivity.this, "Recipe " + recipe.title, Toast.LENGTH_SHORT).show();
-            }
-        });
-        binding.recipeListRV.setAdapter(adapter);
+            });
+            binding.recipeListRV.setAdapter(adapter);
+        }
+    }
+    void initSavedQueryRV() {
+        if(!(binding.recipeListRV.getAdapter() instanceof SavedQueryListRVAdapter)) {
+            binding.recipeListRV.setLayoutManager(new LinearLayoutManager(this));
+            binding.recipeListRV.setHasFixedSize(true);
+            final SavedQueryListRVAdapter adapter = new SavedQueryListRVAdapter(vmRecipeList.selectedSavedQuery);
+            binding.recipeListRV.setAdapter(adapter);
+            vmRecipeList.onRetrieveSavedQueriesRequest();
+        }
     }
 }
