@@ -2,13 +2,20 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/savedQueriesMenu"
-        android:checkable="false"
-        android:icon="@drawable/ic_view_headline_black_24dp"
-        android:title="@string/saved_queries" />
-    <item
-        android:id="@+id/showFavoritesOnly"
-        android:checkable="true"
-        android:icon="@drawable/ic_favorite_border_grey_24dp"
-        android:title="@string/favorites_only" />
+        android:icon="@drawable/ic_more_vert_white_24dp"
+        android:title=""
+        app:showAsAction="always">
+      <menu>
+          <item
+              android:id="@+id/savedQueriesMenu"
+              android:checkable="false"
+              android:icon="@drawable/ic_view_headline_black_24dp"
+              android:title="@string/saved_queries" />
+          <item
+              android:id="@+id/showFavoritesOnly"
+              android:checkable="true"
+              android:icon="@drawable/ic_favorite_border_grey_24dp"
+              android:title="@string/favorites_only" />
+      </menu>
+    </item>
 </menu>
