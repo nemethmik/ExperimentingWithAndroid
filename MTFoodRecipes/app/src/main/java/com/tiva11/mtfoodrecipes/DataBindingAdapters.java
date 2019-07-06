@@ -13,9 +13,7 @@ public final class DataBindingAdapters {
     private static final String TAG = "DataBindingAdapters";
     @BindingAdapter("imageUrl") //No need to add app namespace, it is mandatory only for android namespace
     public static void loadImage(ImageView view, String imageUrl) {
-//        Log.d(TAG, "loadImage: " + imageUrl+ " for " + view.toString());
         Glide.with(view.getContext())
-//                .load(Uri.parse(imageUrl))
                 .load(imageUrl)
                 .apply(
                     new RequestOptions().circleCrop().error(R.drawable.ic_launcher_background)

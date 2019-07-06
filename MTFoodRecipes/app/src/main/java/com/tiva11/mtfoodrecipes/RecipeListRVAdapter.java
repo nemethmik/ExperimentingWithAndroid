@@ -73,7 +73,7 @@ public class RecipeListRVAdapter extends RecyclerView.Adapter {
     public int getItemCount() {
         return recipeList.size();
     }
-    public void setRecipeList(@NonNull List<Recipe> recipeList) {
+    public void submitList(@NonNull List<Recipe> recipeList) {
         this.recipeList = recipeList;
         this.notifyDataSetChanged();
     }

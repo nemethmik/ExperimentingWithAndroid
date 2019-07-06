@@ -97,7 +97,7 @@ public class RecipeListActivity extends AppCompatActivity {
                 }
                 if(binding.recipeListRV.getAdapter() instanceof RecipeListRVAdapter){
                     RecipeListRVAdapter adapter = (RecipeListRVAdapter)binding.recipeListRV.getAdapter();
-                    adapter.setRecipeList(recipes);
+                    adapter.submitList(recipes);
                 }
             }
         });
