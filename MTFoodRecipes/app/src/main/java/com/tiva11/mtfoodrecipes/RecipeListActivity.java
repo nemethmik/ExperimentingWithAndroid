@@ -178,8 +178,11 @@ public class RecipeListActivity extends AppCompatActivity {
             case R.id.savedQueriesMenu:
                 initSavedQueryRV();
                 break;
-            case R.id.showFavoritesOnly:
+            case R.id.showFavoritesOnlyMenu:
                 //TODO: implement showFavorite Recipes Only
+                break;
+            case R.id.aboutMenu:
+                //TODO: implement about box
                 break;
         }
         return super.onOptionsItemSelected(item);
