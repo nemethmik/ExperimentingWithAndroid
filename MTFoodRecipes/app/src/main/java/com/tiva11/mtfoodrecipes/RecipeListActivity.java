@@ -32,6 +32,7 @@ import java.util.List;
 public class RecipeListActivity extends AppCompatActivity {
     private static final String TAG = "RecipeListActivity";
     private static final String QUERY_STRING = "QUERY_STRING";
+    private static final String RECIPE_ID = "RECIPE_ID";
     private VMRecipeList vmRecipeList;
     private ActivityRecipeListBinding binding;
     @Override
@@ -109,7 +110,15 @@ public class RecipeListActivity extends AppCompatActivity {
                 if(binding.recipeListRV.getAdapter() instanceof RecipeListRVAdapter){
                     RecipeListRVAdapter adapter = (RecipeListRVAdapter)binding.recipeListRV.getAdapter();
                     adapter.submitList(recipes);
-                    saveQueryStringInSharedPreferences(vmRecipeList.queryString.getValue());
+                    String savedRecipeId = getSavedRecipeIdFromSharedPreferences();
+                    if(savedRecipeId != null && !savedRecipeId.isEmpty()) {
+                        for(int position = 0;position < recipes.size();position++) {
+                            if(recipes.get(position).recipeId.equals(savedRecipeId)) {
+                                binding.recipeListRV.scrollToPosition(position);
+                                break;
+                            }
+                        }
+                    }
                 }
             }
         });
@@ -121,7 +130,7 @@ public class RecipeListActivity extends AppCompatActivity {
             public void onChanged(@Nullable List<SavedQuery> savedQueries) {
                 if(binding.recipeListRV.getAdapter() instanceof SavedQueryListRVAdapter) {
                     ((SavedQueryListRVAdapter)binding.recipeListRV.getAdapter()).submitList(savedQueries);
-                    saveQueryStringInSharedPreferences(null); //Delete the saved query String
+                    saveQueryStringInSharedPreferences(null,null); //Delete the saved query String
                 }
             }
         });
@@ -162,6 +171,7 @@ public class RecipeListActivity extends AppCompatActivity {
         }
     }
     void openRecipeDetailsActivity(Recipe recipe) {
+        saveQueryStringInSharedPreferences(vmRecipeList.queryString.getValue(),recipe.recipeId);
         Intent i = new Intent(this,RecipeDetailsActivity.class);
         i.putExtra(RecipeDetailsActivity.EXTRA_RECIPEID,recipe.recipeId);
         startActivity(i);
@@ -205,13 +215,19 @@ public class RecipeListActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-    private void saveQueryStringInSharedPreferences(String queryString) {
+    private void saveQueryStringInSharedPreferences(String queryString,String recipeId) {
         SharedPreferences.Editor editor = this.getPreferences(Context.MODE_PRIVATE).edit();
         if(queryString == null || queryString.isEmpty()) editor.remove(QUERY_STRING);
-        else editor.putString(QUERY_STRING,queryString);
+        else {
+            editor.putString(QUERY_STRING,queryString);
+            editor.putString(RECIPE_ID,recipeId);
+        }
         editor.apply();
     }
     private String getSavedQueryStringFromSharedPreferences() {
         return getPreferences(Context.MODE_PRIVATE).getString(QUERY_STRING,null);
+    }
+    private String getSavedRecipeIdFromSharedPreferences() {
+        return getPreferences(Context.MODE_PRIVATE).getString(RECIPE_ID,null);
     }
 }
