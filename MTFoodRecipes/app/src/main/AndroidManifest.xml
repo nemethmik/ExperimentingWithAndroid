@@ -9,14 +9,20 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity
+        <!--activity
             android:name=".RecipeDetailsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity-->
+        <activity android:name=".RecipeListActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
-        <!-- activity
+        <activity
             android:name=".RecipeDetailsActivity"
             android:label="@string/title_activity_recipe_details"
             android:parentActivityName=".RecipeListActivity"
@@ -25,12 +31,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tiva11.mtfoodrecipes.RecipeListActivity" />
         </activity>
-        <activity android:name=".RecipeListActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity -->
     </application>
 
 </manifest>

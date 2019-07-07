@@ -5,7 +5,7 @@
     <data>
         <variable
             name="Recipe"
-            type="com.tiva11.food2fork.Recipe" />
+            type="android.arch.lifecycle.LiveData&lt;com.tiva11.food2fork.Recipe>" />
         <variable
             name="UI"
             type="com.tiva11.mtfoodrecipes.RecipeDetailsActivity" />
@@ -34,7 +34,6 @@
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
-    <!-- include layout="@layout/content_recipe_details" android:id="@+id/content"/ -->
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -141,7 +140,6 @@
                 app:layout_constraintTop_toBottomOf="@+id/ingedientsLabel" />
         </android.support.constraint.ConstraintLayout>
     </android.support.v4.widget.NestedScrollView>
-    <!-- ************ -->
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"

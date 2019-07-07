@@ -10,7 +10,11 @@ import java.util.List;
 
 public class VMRecipeList extends ViewModel {
     private final MutableLiveData<List<Recipe>> recipeList = new MutableLiveData<>();
-    public LiveData<List<Recipe>> getRecipes() {return recipeList;} //Read-only for UI
+    public LiveData<List<Recipe>> getRecipes() {
+        if(recipeList.getValue() == null) recipeList.setValue(new ArrayList<Recipe>());
+        return recipeList;
+    } //Read-only for UI
+//    public void clearRecipeList() { recipeList.setValue(new ArrayList<Recipe>()); }
     public final MutableLiveData<String> queryString = new MutableLiveData<>();//editText @={vm.queryString}
     final public MutableLiveData<Integer> page = new MutableLiveData<>();
     public final MutableLiveData<Throwable> error = new MutableLiveData<>();
@@ -19,6 +23,18 @@ public class VMRecipeList extends ViewModel {
         //The parameters are already expected in the queryString and page MLDs
 //        Food2Fork.searchRecipesAsync(queryString.getValue(),page.getValue(),recipeList,error);
         Food2Fork.searchRecipesWithExecutor(queryString.getValue(),page.getValue(),recipeList,error);
+    }
+    public final MutableLiveData<Recipe> recipe = new MutableLiveData<>();
+    public void onGetDemoRecipeRequest(){
+        Recipe r = new Recipe();
+        r.title = "Cajun Spices";
+        r.publisher = "Gourmet Central";
+        r.favoriteTime = new Date();
+        r.isFavorite = true;
+        r.socialRank = 97.8;
+        r.imageUrl = "https://assets3.thrillist.com/v1/image/1774322/size/tmg-article_default_mobile.jpg";
+        recipe.setValue(r);
+
     }
     //----------------------------------
     // Saved Queries/Categories - Later this may be factored out into a separate VM

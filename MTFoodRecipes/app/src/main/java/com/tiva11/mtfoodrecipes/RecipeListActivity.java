@@ -3,6 +3,9 @@ package com.tiva11.mtfoodrecipes;
 import android.Manifest;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -28,6 +31,7 @@ import java.util.List;
 
 public class RecipeListActivity extends AppCompatActivity {
     private static final String TAG = "RecipeListActivity";
+    private static final String QUERY_STRING = "QUERY_STRING";
     private VMRecipeList vmRecipeList;
     private ActivityRecipeListBinding binding;
     @Override
@@ -45,7 +49,11 @@ public class RecipeListActivity extends AppCompatActivity {
         vmRecipeList = ViewModelProviders.of(this).get(VMRecipeList.class);
         setSupportActionBar(binding.toolbar);//This is terribly important for menus
         subscribeVMObservers();
-        initSavedQueryRV();
+        String savedQueryString = getSavedQueryStringFromSharedPreferences();
+        if(savedQueryString != null && !savedQueryString.isEmpty()) {
+            initRecipeListRV();
+            loadPageOfRecipesViaTheVM(savedQueryString,1);
+        } else initSavedQueryRV();
         initSearchViewAndSetListener();
     }
     void initSearchViewAndSetListener(){
@@ -101,6 +109,7 @@ public class RecipeListActivity extends AppCompatActivity {
                 if(binding.recipeListRV.getAdapter() instanceof RecipeListRVAdapter){
                     RecipeListRVAdapter adapter = (RecipeListRVAdapter)binding.recipeListRV.getAdapter();
                     adapter.submitList(recipes);
+                    saveQueryStringInSharedPreferences(vmRecipeList.queryString.getValue());
                 }
             }
         });
@@ -112,6 +121,7 @@ public class RecipeListActivity extends AppCompatActivity {
             public void onChanged(@Nullable List<SavedQuery> savedQueries) {
                 if(binding.recipeListRV.getAdapter() instanceof SavedQueryListRVAdapter) {
                     ((SavedQueryListRVAdapter)binding.recipeListRV.getAdapter()).submitList(savedQueries);
+                    saveQueryStringInSharedPreferences(null); //Delete the saved query String
                 }
             }
         });
@@ -145,10 +155,16 @@ public class RecipeListActivity extends AppCompatActivity {
                     //This way we wouldn't need this setTag/getTag smart solution
                     //This is possible only with data binding.
                     Toast.makeText(RecipeListActivity.this, "Recipe " + recipe.title, Toast.LENGTH_SHORT).show();
+                    openRecipeDetailsActivity(recipe);
                 }
             });
             binding.recipeListRV.setAdapter(adapter);
         }
+    }
+    void openRecipeDetailsActivity(Recipe recipe) {
+        Intent i = new Intent(this,RecipeDetailsActivity.class);
+        i.putExtra(RecipeDetailsActivity.EXTRA_RECIPEID,recipe.recipeId);
+        startActivity(i);
     }
     void initSavedQueryRV() {
         if(!(binding.recipeListRV.getAdapter() instanceof SavedQueryListRVAdapter)) {
@@ -164,6 +180,7 @@ public class RecipeListActivity extends AppCompatActivity {
         //When the current page is displaying the recipe list, we should go back to the saved queries list
         //The user can only quit the application with back buttons only from the saved query list view
         if(binding.recipeListRV.getAdapter() instanceof RecipeListRVAdapter) {
+//            vmRecipeList.clearRecipeList();
             initSavedQueryRV();
         } else super.onBackPressed();
     }
@@ -176,6 +193,7 @@ public class RecipeListActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case R.id.savedQueriesMenu:
+//                vmRecipeList.clearRecipeList();
                 initSavedQueryRV();
                 break;
             case R.id.showFavoritesOnlyMenu:
@@ -186,5 +204,14 @@ public class RecipeListActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+    private void saveQueryStringInSharedPreferences(String queryString) {
+        SharedPreferences.Editor editor = this.getPreferences(Context.MODE_PRIVATE).edit();
+        if(queryString == null || queryString.isEmpty()) editor.remove(QUERY_STRING);
+        else editor.putString(QUERY_STRING,queryString);
+        editor.apply();
+    }
+    private String getSavedQueryStringFromSharedPreferences() {
+        return getPreferences(Context.MODE_PRIVATE).getString(QUERY_STRING,null);
     }
 }
