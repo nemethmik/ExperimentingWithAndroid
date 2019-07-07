@@ -1,5 +1,6 @@
  package com.tiva11.food2fork;
 
+        import java.util.Date;
         import java.util.List;
         import android.os.Parcel;
         import android.os.Parcelable;
@@ -7,9 +8,7 @@
         import com.google.gson.annotations.Expose;
         import com.google.gson.annotations.SerializedName;
 
-public class Recipe implements Parcelable
-{
-
+public class Recipe implements Parcelable {
     @SerializedName("publisher")
     @Expose
     public String publisher;
@@ -38,22 +37,16 @@ public class Recipe implements Parcelable
     @Expose
     public String title;
     public final static Parcelable.Creator<Recipe> CREATOR = new Creator<Recipe>() {
-
-
         @SuppressWarnings({
                 "unchecked"
         })
         public Recipe createFromParcel(Parcel in) {
             return new Recipe(in);
         }
-
         public Recipe[] newArray(int size) {
             return (new Recipe[size]);
         }
-
-    }
-            ;
-
+    };
     protected Recipe(Parcel in) {
         this.publisher = ((String) in.readValue((String.class.getClassLoader())));
         this.f2fUrl = ((String) in.readValue((String.class.getClassLoader())));
@@ -65,13 +58,10 @@ public class Recipe implements Parcelable
         this.publisherUrl = ((String) in.readValue((String.class.getClassLoader())));
         this.title = ((String) in.readValue((String.class.getClassLoader())));
     }
-
-    /**
-     * No args constructor for use in serialization
-     *
-     */
-    public Recipe() {
-    }
+    public Recipe() { }
+//Application specific members, not from Food2Fork API
+    public boolean isFavorite;
+    public Date favoriteTime;
 
     /**
      *

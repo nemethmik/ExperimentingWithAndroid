@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="Recipe"
+            type="com.tiva11.food2fork.Recipe" />
+        <variable
+            name="UI"
+            type="com.tiva11.mtfoodrecipes.RecipeDetailsActivity" />
+    </data>
+
+<android.support.design.widget.CoordinatorLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RecipeDetailsActivity">
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:popupTheme="@style/AppTheme.PopupOverlay" >
+            <SearchView
+                android:id="@+id/searchView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:queryHint="Search Recipes ..." />
+        </android.support.v7.widget.Toolbar>
+
+    </android.support.design.widget.AppBarLayout>
+    <!-- include layout="@layout/content_recipe_details" android:id="@+id/content"/ -->
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:context=".RecipeDetailsActivity"
+        tools:showIn="@layout/activity_recipe_details"
+        tools:visibility="visible">
+
+        <android.support.constraint.ConstraintLayout
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:scaleType="centerCrop"
+                app:imageUrl="@{Recipe.imageUrl}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_launcher_background" />
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{Recipe.title}"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageView"
+                tools:text="Recipe Title" />
+
+            <TextView
+                android:id="@+id/publisher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text='@{Recipe.publisher}'
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/title"
+                tools:text="Recipe Publisher" />
+
+            <TextView
+                android:id="@+id/socialRank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{Math.round(Recipe.socialRank)}"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintEnd_toEndOf="@+id/imageView"
+                app:layout_constraintTop_toTopOf="@+id/publisher"
+                tools:text="100" />
+
+            <ImageView
+                android:id="@+id/isFavorite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:visibility="@{Recipe.isFavorite}"
+                app:layout_constraintStart_toStartOf="@+id/publisher"
+                app:layout_constraintTop_toBottomOf="@+id/publisher"
+                app:srcCompat="@drawable/ic_favorite_red_24dp"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/favoriteTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@{Recipe.favoriteTime}"
+                android:visibility="@{Recipe.isFavorite}"
+                app:layout_constraintBottom_toBottomOf="@+id/isFavorite"
+                app:layout_constraintStart_toEndOf="@+id/isFavorite"
+                app:layout_constraintTop_toTopOf="@+id/isFavorite"
+                tools:text="2019.12.31 11:59"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/ingedientsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/ingredients"
+                app:layout_constraintStart_toStartOf="@+id/isFavorite"
+                app:layout_constraintTop_toBottomOf="@+id/isFavorite" />
+
+            <ListView
+                android:id="@+id/ingredientsListView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/ingedientsLabel"
+                app:layout_constraintTop_toBottomOf="@+id/ingedientsLabel" />
+        </android.support.constraint.ConstraintLayout>
+    </android.support.v4.widget.NestedScrollView>
+    <!-- ************ -->
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        android:layout_gravity="bottom|end"
+        android:onClick="@{(v)->UI.onFavoriteFABClicked(Recipe)}"
+        app:srcCompat="@drawable/ic_favorite_border_grey_24dp" />
+
+</android.support.design.widget.CoordinatorLayout>
+</layout>
