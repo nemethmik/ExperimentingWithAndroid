@@ -1,6 +1,7 @@
 package com.tiva11.mtfoodrecipes;
 
 import android.Manifest;
+import android.app.Activity;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -27,12 +28,23 @@ import com.tiva11.food2fork.SavedQuery;
 import com.tiva11.food2fork.VMRecipeList;
 import com.tiva11.mtfoodrecipes.databinding.ActivityRecipeListBinding;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 public class RecipeListActivity extends AppCompatActivity {
+    //TODO: Swipe up to next page, no more data toast
+    //TODO: Review and elaborate an interface with meaningful names to formalize the communication
+    //TODO: Add a singleton Repository, which is used throughout the entire application across activities
     private static final String TAG = "RecipeListActivity";
     private static final String QUERY_STRING = "QUERY_STRING";
     private static final String RECIPE_ID = "RECIPE_ID";
+    private static final String FAVORITE_RECIPES = "com.tiva11.FAVORITE_RECIPES";
+    public static final String EXTRA_QUERY_STRING = "QUERY_STRING";
+    public static final String DATE_FORMAT = "yyyy.MM.dd HH:mm:ss";
     private VMRecipeList vmRecipeList;
     private ActivityRecipeListBinding binding;
     @Override
@@ -48,13 +60,22 @@ public class RecipeListActivity extends AppCompatActivity {
 //        setContentView(binding.getRoot());
         //setContentView(R.layout.activity_recipe_list); //This is the old style, no data binding
         vmRecipeList = ViewModelProviders.of(this).get(VMRecipeList.class);
+        vmRecipeList.favoriteRecipes = getFavoritesFromSharedPreferences(this);
         setSupportActionBar(binding.toolbar);//This is terribly important for menus
         subscribeVMObservers();
-        String savedQueryString = getSavedQueryStringFromSharedPreferences();
-        if(savedQueryString != null && !savedQueryString.isEmpty()) {
+        if(getIntent().hasExtra(EXTRA_QUERY_STRING)) {
+            String extraQueryString = getIntent().getStringExtra(EXTRA_QUERY_STRING);
             initRecipeListRV();
-            loadPageOfRecipesViaTheVM(savedQueryString,1);
-        } else initSavedQueryRV();
+            loadPageOfRecipesViaTheVM(extraQueryString,1);
+            binding.searchView.setQuery(extraQueryString,false);
+        } else {
+            String savedQueryString = getSavedQueryStringFromSharedPreferences();
+            if (savedQueryString != null && !savedQueryString.isEmpty()) {
+                initRecipeListRV();
+                loadPageOfRecipesViaTheVM(savedQueryString, 1);
+                binding.searchView.setQuery(savedQueryString, false);
+            } else initSavedQueryRV();
+        }
         initSearchViewAndSetListener();
     }
     void initSearchViewAndSetListener(){
@@ -100,24 +121,27 @@ public class RecipeListActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable List<Recipe> recipes) {
                 showProgressBar(false);
-                if(recipes.size() > 0) {
-                    Log.d(TAG, "onChanged: recipes " + recipes.size() + " with " + recipes.get(recipes.size() - 1).title);
-                    Toast.makeText(RecipeListActivity.this, "Number of recipes is " + recipes.size(), Toast.LENGTH_LONG).show();
-                } else {
-                    Log.d(TAG, "onChanged: no recipes");
-                    Toast.makeText(RecipeListActivity.this, "No recipes", Toast.LENGTH_SHORT).show();
-                }
-                if(binding.recipeListRV.getAdapter() instanceof RecipeListRVAdapter){
-                    RecipeListRVAdapter adapter = (RecipeListRVAdapter)binding.recipeListRV.getAdapter();
-                    adapter.submitList(recipes);
-                    String savedRecipeId = getSavedRecipeIdFromSharedPreferences();
-                    if(savedRecipeId != null && !savedRecipeId.isEmpty()) {
-                        for(int position = 0;position < recipes.size();position++) {
-                            if(recipes.get(position).recipeId.equals(savedRecipeId)) {
-                                binding.recipeListRV.scrollToPosition(position);
-                                break;
+                if (recipes != null) {
+                    if (recipes.size() > 0) {
+                        Log.d(TAG, "onChanged: recipes " + recipes.size() + " with " + recipes.get(recipes.size() - 1).title);
+                        Toast.makeText(RecipeListActivity.this, "Number of recipes is " + recipes.size(), Toast.LENGTH_LONG).show();
+                    } else {
+//                    Log.d(TAG, "onChanged: no recipes");
+//                    Toast.makeText(RecipeListActivity.this, "No recipes", Toast.LENGTH_SHORT).show();
+                    }
+                    if (binding.recipeListRV.getAdapter() instanceof RecipeListRVAdapter) {
+                        RecipeListRVAdapter adapter = (RecipeListRVAdapter) binding.recipeListRV.getAdapter();
+                        adapter.submitList(recipes);
+                        String savedRecipeId = getSavedRecipeIdFromSharedPreferences();
+                        if (savedRecipeId != null && !savedRecipeId.isEmpty()) {
+                            for (int position = 0; position < recipes.size(); position++) {
+                                if (recipes.get(position).recipeId.equals(savedRecipeId)) {
+                                    binding.recipeListRV.scrollToPosition(position);
+                                    break;
+                                }
                             }
                         }
+
                     }
                 }
             }
@@ -137,6 +161,7 @@ public class RecipeListActivity extends AppCompatActivity {
         vmRecipeList.selectedSavedQuery.observe(this, new Observer<SavedQuery>() {
             @Override
             public void onChanged(@Nullable SavedQuery selectedSavedQuery) {
+                binding.searchView.setQuery(selectedSavedQuery.queryString,false);
                 Toast.makeText(RecipeListActivity.this, selectedSavedQuery.queryString + " selected", Toast.LENGTH_SHORT).show();
                 // loadPageOfRecipes function calls initRecipeListRV automatically if the adapter is not for the recipe list
                 loadPageOfRecipesViaTheVM(selectedSavedQuery.queryString,1);
@@ -229,5 +254,27 @@ public class RecipeListActivity extends AppCompatActivity {
     }
     private String getSavedRecipeIdFromSharedPreferences() {
         return getPreferences(Context.MODE_PRIVATE).getString(RECIPE_ID,null);
+    }
+    public static Map<String, Date> getFavoritesFromSharedPreferences(Activity activity) {
+        SharedPreferences sharedPref = activity.getSharedPreferences(FAVORITE_RECIPES, Context.MODE_PRIVATE);
+        Map<String,String> favorites = (Map<String,String>)sharedPref.getAll();
+        Map<String,Date> favoriteRecipes = new Hashtable<>();
+        if(favorites != null) {
+            for(String recipeId:favorites.keySet()) {
+                try {
+                    favoriteRecipes.put(recipeId, new SimpleDateFormat(DATE_FORMAT).parse(favorites.get(recipeId)));
+                } catch (ParseException e) {
+                    favoriteRecipes.put(recipeId,new Date());
+                }
+            }
+        }
+        return favoriteRecipes;
+    }
+    public static void saveFavoriteInSharedPreferences(Activity activity,String recipeId, Date favoritTime) {
+        SharedPreferences sharedPref = activity.getSharedPreferences(FAVORITE_RECIPES, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        if(favoritTime == null) editor.remove(recipeId);
+        else editor.putString(recipeId, new SimpleDateFormat(DATE_FORMAT).format(favoritTime));
+        editor.apply();
     }
 }

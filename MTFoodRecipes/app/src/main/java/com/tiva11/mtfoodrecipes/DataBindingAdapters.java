@@ -2,13 +2,17 @@ package com.tiva11.mtfoodrecipes;
 
 import android.databinding.BindingAdapter;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public final class DataBindingAdapters {
     private static final String TAG = "DataBindingAdapters";
@@ -48,11 +52,21 @@ public final class DataBindingAdapters {
     }
     @BindingAdapter("android:text")
     public static void setText(TextView view, Date time) {
-        view.setText(String.valueOf(time));
+        if(time == null) view.setText("");
+        else view.setText(String.valueOf(time));
     }
 
     @BindingAdapter("android:visibility")
     public static void setVisibility(View view, Boolean value) {
         view.setVisibility(value ? View.VISIBLE : View.GONE);
+    }
+    @BindingAdapter("stringList")
+    public static void loadDataToListView(ListView view, List<String> data) {
+        if(view.getAdapter() != null && view.getAdapter() instanceof ArrayAdapter) {
+            ArrayAdapter<String> adapter = (ArrayAdapter<String>)view.getAdapter();
+            if(data == null) data = new ArrayList<String>();
+            adapter.addAll(data);
+            adapter.notifyDataSetChanged();
+        }
     }
 }

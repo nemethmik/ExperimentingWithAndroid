@@ -100,7 +100,10 @@ public abstract class Food2Fork {
                 try {
                     Call<SearchRecipesResponse> call = api.searchRecipes(API_KEY, queryString, page);
                     Response<SearchRecipesResponse> response = call.execute();
-                    if(ok(response,mldError)) mldRecipeList.postValue(response.body().recipes);
+                    if(ok(response,mldError)) {
+                        if(response.body().error == null) mldRecipeList.postValue(response.body().recipes);
+                        else mldError.postValue(new Exception(response.body().error));
+                    }
                 } catch (Throwable e) {
                     mldError.postValue(e);
                 }
