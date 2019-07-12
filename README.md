@@ -10,3 +10,16 @@ Flutter/VSC is so much more efficient than Android Studio/Java.
 
 ## Android Studio 3.4 Essentials View Model Demo (32 - 35)
 This example is basically from the book Android Studio 3.4 Essentials chapters 32 - 35: [Android Jetpack ViewModel, LiveData, Data Binding, Binding Expressions in Layout XML Tutorials](https://github.com/nemethmik/ExperimentingWithAndroid/tree/master/AS34Essentials32ViewModelDemo) 
+
+## Android Studio Essentials 3.4 (46) Card and Recycler View Demo
+This example is basically from the book Android Studio 3.4 Essentials chapters 46: [Card and Recycler View Tutorial](https://github.com/nemethmik/ExperimentingWithAndroid/tree/master/AS34Essentials46CardDemo)
+
+## Food2Fork API Tutorial
+This is based on a 20-dollar video tutorial: [Retrofit, View Model, Recycler View, Live Data](https://github.com/nemethmik/ExperimentingWithAndroid/tree/master/MTFoodRecipes)
+I made the majority of the project, and I modified it significantly. This architecture is a total dead end. The way to go is navigation component or Flutter. 
+
+# WearOS is Dead
+[Huawei has dropped the Wear OS](https://www.techradar.com/reviews/huawei-watch-gt-review) software it normally runs on its smartwatches, instead switching to its own OS.
+This was shocking. I bought Huawei Smartwatch 2 vs the lot better Tisen-driven Samsung Gear just because of Android WearOS. 
+
+
