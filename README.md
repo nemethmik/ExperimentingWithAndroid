@@ -5,6 +5,11 @@ I have downloaded GitHub Desktop, either, to get more precise version control of
 Instead of GitHub to monitor what AS version control does, Visual Studio Code is far better. VSC in general is far better than anything else including AS. So, I am going to use VSC along with AS to do tasks where VSC is a lot better. VSC, for example, automatically marks in the editor when you are changing source files, which sections are new, which have been modified, simply brilliant; AS looks really a stone age dead slow tool vs VSC. VSC is brilliant with Flutter. The major problem with Flutter is that it doesn't support WearOS, today. I am just working on learning the new  Paging Library from Android Architecture, and it really looks terrbly overcomplicated, totally unintuitive vs Flutter's clean architecture, honestly. Google is promoting Kotlin vs Java for native Android programming, but honestly Java is a lot cleaner language, but Google has only exemples recently for Kotlin. Flutter/Dart is a clean language, too, just like Java.
 Flutter/VSC is so much more efficient than Android Studio/Java.
 
+## RecyclerViewListItemSampleData
+This is a simple project to show how to add fragment with a recycler view to a navigation graph that shows a list of items in the designer using the tools:kistitem attribute.
+This was inspired by a demo made by the navigation team at [20:06](https://www.youtube.com/watch?v=JFGq0asqSuA&t=1217s)
+
+
 ## Paging Tutorial
 [Paging Tutorial](https://github.com/nemethmik/ExperimentingWithAndroid/tree/master/PagingTutorial) is an AS/Java project experimenting with the new Paging Library from Android Architecture.
 
